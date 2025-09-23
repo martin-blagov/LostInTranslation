@@ -15,14 +15,18 @@ public class GUI {
         SwingUtilities.invokeLater(() -> {
             JPanel countryPanel = new JPanel();
             Translator translator = new JSONTranslator();
-            JComboBox<String> languageComboBox = new JComboBox<>();
+
+            String [] items = new String[translator.getCountryCodes().size()];
             String displayLanguage = "en";
+            int i = 0;
             for(String countryCode : translator.getCountryCodes()) {
                 String countryName = translator.translate(countryCode, displayLanguage);
-                languageComboBox.addItem(countryName);
+                items[i++] = countryName;
             }
-            countryPanel.add(new JLabel("Country:"));
-            countryPanel.add(languageComboBox);
+            JList<String> list = new JList<>(items);
+            JScrollPane scrollPane = new JScrollPane(list);
+
+            countryPanel.add(scrollPane);
 
             JPanel languagePanel = new JPanel();
             JTextField languageField = new JTextField(10);
@@ -44,7 +48,7 @@ public class GUI {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     String language = languageField.getText();
-                    String country = languageComboBox.getSelectedItem().toString();
+                    String country = list.getSelectedValue();
 
                     // for now, just using our simple translator, but
                     // we'll need to use the real JSON version later.
