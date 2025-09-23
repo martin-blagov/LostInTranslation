@@ -61,12 +61,15 @@ public class JSONTranslator implements Translator {
                         // TODO Task C: record this translation in the appropriate instance variable
                         translations.put(countryCode+"-"+languageCode, countryData.getString(languageCode));
 
+                        if(!languageCodes.contains(languageCode)){
+                            languageCodes.add(languageCode);
+                        }
+
                         if (!languages.contains(languageCode)) {
                             languages.add(languageCode);
                         }
                     }
                 }
-                languageCodes.addAll(languages);
             }
         }
         catch (IOException | URISyntaxException ex) {
