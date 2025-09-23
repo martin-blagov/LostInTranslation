@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 /**
  * This class provides the services of: <br/>
@@ -41,8 +42,23 @@ public class LanguageCodeConverter {
             Iterator<String> iterator = lines.iterator();
             iterator.next(); // skip the first line
             while (iterator.hasNext()) {
-                String line = iterator.next();
+                String line = iterator.next().trim();
+
                 // TODO Task A: use line to populate the instance variables
+                if (line.isEmpty()) continue;
+
+                String[] parts = line.split("\\s+"); // split by whitespace
+                String code = parts[parts.length-1]; // last piece of input line is the code
+
+                StringBuilder nameBuilder = new StringBuilder();
+                for (int i=0; i<parts.length-1; i++) {
+                    if (i>0) nameBuilder.append(" ");
+                    nameBuilder.append(parts[i]);
+                }
+                String language = nameBuilder.toString();
+
+                languageCodeToLanguage.put(code, language);
+                languageToLanguageCode.put(language, code);
             }
 
         } catch (IOException | URISyntaxException ex) {
@@ -57,7 +73,7 @@ public class LanguageCodeConverter {
      */
     public String fromLanguageCode(String code) {
         // TODO Task A: update this code to use the correct instance variable to return the appropriate value
-        return code;
+        return languageCodeToLanguage.get(code);
     }
 
     /**
@@ -67,7 +83,7 @@ public class LanguageCodeConverter {
      */
     public String fromLanguage(String language) {
         // TODO Task A: update this code to use the correct instance variable to return the appropriate value
-        return language;
+        return languageCodeToLanguage.get(language);
     }
 
     /**
