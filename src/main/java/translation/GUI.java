@@ -2,6 +2,7 @@ package translation;
 
 import javax.swing.*;
 import java.awt.event.*;
+import java.util.List;
 
 
 // TODO Task D: Update the GUI for the program to align with UI shown in the README example.
@@ -14,16 +15,33 @@ public class GUI {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             JPanel countryPanel = new JPanel();
-            JTextField countryField = new JTextField(10);
-            countryField.setText("can");
-            countryField.setEditable(false); // we only support the "can" country code for now
-            countryPanel.add(new JLabel("Country:"));
-            countryPanel.add(countryField);
+            Translator translator = new JSONTranslator();
+
+            String [] items = new String[translator.getCountryCodes().size()];
+            String displayLanguage = "en";
+            int i = 0;
+            for(String countryCode : translator.getCountryCodes()) {
+                String countryName = translator.translate(countryCode, displayLanguage);
+                items[i++] = countryName;
+            }
+            JList<String> list = new JList<>(items);
+            JScrollPane scrollPane = new JScrollPane(list);
+
+            countryPanel.add(scrollPane);
 
             JPanel languagePanel = new JPanel();
-            JTextField languageField = new JTextField(10);
+
+            JSONTranslator jsonTranslator = new JSONTranslator();
+            LanguageCodeConverter langconverter = new LanguageCodeConverter();
+            List<String> languages = jsonTranslator.getLanguageCodes();
+            String[] languagesArray = new String[languages.size()];
+            for(int i = 0; i < languages.size(); i++) {
+                languagesArray[i] = langconverter.fromLanguageCode(languages.get(i));
+            }
+//            JTextField languageField = new JTextField(10);
+            JComboBox<String> languageCombo = new JComboBox<>(languagesArray);
             languagePanel.add(new JLabel("Language:"));
-            languagePanel.add(languageField);
+            languagePanel.add(languageCombo);
 
             JPanel buttonPanel = new JPanel();
             JButton submit = new JButton("Submit");
@@ -39,12 +57,15 @@ public class GUI {
             submit.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    String language = languageField.getText();
-                    String country = countryField.getText();
+
+
+//                    String language = languageField.getText();
+                    String language = langconverter.fromLanguage((String) languageCombo.getSelectedItem());
+                    String country = list.getSelectedValue();
 
                     // for now, just using our simple translator, but
                     // we'll need to use the real JSON version later.
-                    Translator translator = new CanadaTranslator();
+                    Translator translator = new JSONTranslator();
 
                     String result = translator.translate(country, language);
                     if (result == null) {
