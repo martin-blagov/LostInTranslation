@@ -35,8 +35,8 @@ public class GUI {
             LanguageCodeConverter langconverter = new LanguageCodeConverter();
             List<String> languages = jsonTranslator.getLanguageCodes();
             String[] languagesArray = new String[languages.size()];
-            for(int i = 0; i < languages.size(); i++) {
-                languagesArray[i] = langconverter.fromLanguageCode(languages.get(i));
+            for(int j = 0; j < languages.size(); j++) {
+                languagesArray[j] = langconverter.fromLanguageCode(languages.get(j));
             }
 //            JTextField languageField = new JTextField(10);
             JComboBox<String> languageCombo = new JComboBox<>(languagesArray);
@@ -61,13 +61,15 @@ public class GUI {
 
 //                    String language = languageField.getText();
                     String language = langconverter.fromLanguage((String) languageCombo.getSelectedItem());
-                    String country = list.getSelectedValue();
+
+                    int index = list.getSelectedIndex();
+                    String countryCode = translator.getCountryCodes().get(index);
 
                     // for now, just using our simple translator, but
                     // we'll need to use the real JSON version later.
                     Translator translator = new JSONTranslator();
 
-                    String result = translator.translate(country, language);
+                    String result = translator.translate(countryCode, language);
                     if (result == null) {
                         result = "no translation found!";
                     }
