@@ -1,6 +1,8 @@
 package translation;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.event.*;
 import java.util.List;
 
@@ -44,8 +46,8 @@ public class GUI {
             languagePanel.add(languageCombo);
 
             JPanel buttonPanel = new JPanel();
-            JButton submit = new JButton("Submit");
-            buttonPanel.add(submit);
+//            JButton submit = new JButton("Submit");
+//            buttonPanel.add(submit);
 
             JLabel resultLabelText = new JLabel("Translation:");
             buttonPanel.add(resultLabelText);
@@ -54,19 +56,16 @@ public class GUI {
 
 
             // adding listener for when the user clicks the submit button
-            submit.addActionListener(new ActionListener() {
+            Runnable performTranslation = new Runnable() {
                 @Override
-                public void actionPerformed(ActionEvent e) {
+                public void run() {
+                    if (languageCombo.getSelectedItem() == null) return;
 
-
-//                    String language = languageField.getText();
                     String language = langconverter.fromLanguage((String) languageCombo.getSelectedItem());
 
                     int index = list.getSelectedIndex();
                     String countryCode = translator.getCountryCodes().get(index);
 
-                    // for now, just using our simple translator, but
-                    // we'll need to use the real JSON version later.
                     Translator translator = new JSONTranslator();
 
                     String result = translator.translate(countryCode, language);
@@ -74,16 +73,32 @@ public class GUI {
                         result = "no translation found!";
                     }
                     resultLabel.setText(result);
-
                 }
+            };
 
+            // Add listeners to both components
+            list.addListSelectionListener(new ListSelectionListener() {
+                @Override
+                public void valueChanged(ListSelectionEvent e) {
+                    if (!e.getValueIsAdjusting()) { // Only respond to final selection
+                        performTranslation.run();
+                    }
+                }
             });
+
+            languageCombo.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    performTranslation.run();
+                }
+            });
+
 
             JPanel mainPanel = new JPanel();
             mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-            mainPanel.add(countryPanel);
             mainPanel.add(languagePanel);
             mainPanel.add(buttonPanel);
+            mainPanel.add(countryPanel);
 
             JFrame frame = new JFrame("Country Name Translator");
             frame.setContentPane(mainPanel);
